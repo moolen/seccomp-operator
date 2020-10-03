@@ -15,6 +15,7 @@
 GO ?= go
 
 PROJECT := seccomp-operator
+PLUGIN := seccomp-ebpf-trace
 BUILD_DIR := build
 
 DATE_FMT = +'%Y-%m-%dT%H:%M:%SZ'
@@ -37,6 +38,7 @@ LDVARS := \
 	-X $(GO_PROJECT)/internal/pkg/version.gitTreeState=$(GIT_TREE_STATE) \
 	-X $(GO_PROJECT)/internal/pkg/version.version=$(VERSION)
 LDFLAGS := -s -w -linkmode external -extldflags "-static" $(LDVARS)
+PLUGINLDFLAGS := -s -w -linkmode external $(LDVARS)
 
 CONTAINER_RUNTIME ?= docker
 IMAGE ?= $(PROJECT):latest
@@ -48,7 +50,7 @@ REPO_INFRA_VERSION = v0.1.1
 
 # Utility targets
 
-all: $(BUILD_DIR)/$(PROJECT) ## Build the seccomp-operator binary
+all: $(BUILD_DIR)/$(PROJECT) $(BUILD_DIR)/$(PLUGIN) ## Build the seccomp-operator binary
 
 .PHONY: help
 help:  ## Display this help
@@ -72,6 +74,9 @@ $(BUILD_DIR):
 
 $(BUILD_DIR)/$(PROJECT): $(BUILD_DIR) $(BUILD_FILES)
 	$(GO) build -ldflags '$(LDFLAGS)' -tags '$(BUILDTAGS)' -o $@ ./cmd/seccomp-operator
+
+$(BUILD_DIR)/$(PLUGIN): $(BUILD_DIR) $(BUILD_FILES)
+	$(GO) build -ldflags '$(PLUGINLDFLAGS)' -tags '$(BUILDTAGS)' -o $@ ./cmd/seccomp-ebpf-trace
 
 .PHONY: clean
 clean: ## Clean the build directory

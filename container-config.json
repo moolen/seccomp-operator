@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "name": "coredns"
+  },
+  "labels": {
+    "io.kubernetes.container.name": "coredns",
+    "io.kubernetes.pod.name": "coredns-66bff467f8-hqt8f",
+    "io.kubernetes.pod.namespace": "kube-system",
+    "io.kubernetes.pod.uid": "2b82ab5c-b7b5-45e5-9a58-64e3374047f0"
+  },
+  "annotations": {
+    "io.kubernetes.container.hash": "c485abb9",
+    "io.kubernetes.container.ports": "[{\"name\":\"dns\",\"containerPort\":53,\"protocol\":\"UDP\"},{\"name\":\"dns-tcp\",\"containerPort\":53,\"protocol\":\"TCP\"},{\"name\":\"metrics\",\"containerPort\":9153,\"protocol\":\"TCP\"}]",
+    "io.kubernetes.container.restartCount": "0",
+    "io.kubernetes.container.terminationMessagePath": "/dev/termination-log",
+    "io.kubernetes.container.terminationMessagePolicy": "File",
+    "io.kubernetes.pod.terminationGracePeriod": "30"
+  },
+  "image": {
+    "image": "nginx"
+  },
+  "log_path": "nginx/0.log",
+  "linux": {}
+}

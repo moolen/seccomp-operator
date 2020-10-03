@@ -20,6 +20,9 @@ const (
 	// OperatorName is the name when referring to the operator.
 	OperatorName = "seccomp-operator"
 
+	// NRIPluginName is the name when referring to the NRI trace-plugin
+	NRIPluginName = "seccomp-ebpf-trace"
+
 	// kubeletSeccompRootPath specifies the path where all kubelet seccomp
 	// profiles are stored.
 	kubeletSeccompRootPath = "/var/lib/kubelet/seccomp"

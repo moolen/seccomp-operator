@@ -1,0 +1,21 @@
+{
+    "metadata": {
+        "attempt": 0,
+        "name": "coredns-66bff467f8-hqt8f",
+        "namespace": "kube-system",
+        "uid": "2b82ab5c-b7b5-45e5-9a58-64e3374047f0"
+    },
+    "labels": {
+        "io.kubernetes.pod.name": "coredns-66bff467f8-hqt8f",
+        "io.kubernetes.pod.namespace": "kube-system",
+        "io.kubernetes.pod.uid": "2b82ab5c-b7b5-45e5-9a58-64e3374047f0",
+        "k8s-app": "kube-dns",
+        "pod-template-hash": "66bff467f8"
+    },
+    "annotations": {
+        "kubernetes.io/config.seen": "2020-10-03T19:01:21.484495993Z",
+        "kubernetes.io/config.source": "api"
+    },
+    "logDirectory": "/tmp",
+    "linux": {}
+}
