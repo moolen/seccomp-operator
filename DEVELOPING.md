@@ -29,6 +29,35 @@
 
 3. seccomp operator must merge different secomp profiles from different replicas
 
+
+## Workflow
+
+### use-case: diff syscalls of old/new version of app
+
+1. Create a CRD to record pods that will be created in the near future.
+```
+apiVersion: seccomp-operator.x-k8s.io/v1alpha1
+kind: SeccompRecorder
+metadata:
+  name: example-profile
+spec:
+  # name of the resulting profile kind=SeccompProfile resource
+  profileName: my-profile-8fc0a3
+
+  # simple __annotations__ selector
+  selector:
+    app: myapp
+    build: 8fc0a3
+status: {} # TBD
+
+```
+
+2. deploy app
+3. apply tests
+4. delete app
+5. diff seccomp profiles
+6. profit
+
 # Minikube
 
 ```cmd

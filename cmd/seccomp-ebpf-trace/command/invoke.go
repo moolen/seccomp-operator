@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/containerd/nri/skel"
+	nritypes "github.com/containerd/nri/types/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -38,18 +39,16 @@ func invoke(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("error getting config: %w", err)
 	}
-
-	if nri.ShouldStopTrace() {
-		// TODO: close prog from eBPF fs?
-		return nil
-	} else if nri.ShouldStartTrace() {
-		return BackgroundTrace(nri.GetPID(), cfg.ProfileDir, cfg.DebugLogDir, nri.Pod(), nri.PodUID())
+	req := nri.Request()
+	if req == nil {
+		return fmt.Errorf("missing nri request")
 	}
-	return nil
-}
-
-func CloseTrace() error {
-	logrus.Infof("closing tracer")
+	if shouldStopTrace(req) {
+		// TODO: close prog via eBPF fs?
+		return nil
+	} else if shouldStartTrace(req) {
+		return BackgroundTrace(nri.GetPID(), cfg.ProfileDir, cfg.DebugLogDir, Pod(req), PodUID(req))
+	}
 	return nil
 }
 
@@ -75,7 +74,7 @@ func BackgroundTrace(pid int, profileDir, debugLogDir, podName, podUID string) e
 	if debugLogDir != "" {
 		args = append(args, "--"+logFileFlag, filepath.Join(debugLogDir, fmt.Sprintf("seccomp-log.%s.%s.log", podName, podUID)))
 	}
-	args = append(args, "trace", "--"+pidFlag, strconv.Itoa(pid))
+	args = append(args, traceCmd.Name, "--"+pidFlag, strconv.Itoa(pid))
 	if profileDir != "" {
 		args = append(args, "--"+outFileFlag, filepath.Join(profileDir, fmt.Sprintf("seccomp-profile.%s.%s.json", podName, podUID)))
 	}
@@ -113,4 +112,36 @@ func BackgroundTrace(pid int, profileDir, debugLogDir, podName, podUID string) e
 		return errors.Errorf("child process timed out")
 	}
 	return nil
+}
+
+func shouldStartTrace(req *nritypes.Request) bool {
+	if req.State != nritypes.Create {
+		return false
+	}
+	t, ok := req.Spec.Annotations[podContainerTypeAnnotation]
+	if !ok {
+		return false
+	}
+	return t == "container"
+}
+
+func shouldStopTrace(req *nritypes.Request) bool {
+	if req.State != nritypes.Delete {
+		return false
+	}
+	t, ok := req.Spec.Annotations[podContainerTypeAnnotation]
+	if !ok {
+		return false
+	}
+	return t == "container"
+}
+
+func PodUID(req *nritypes.Request) string {
+	return req.Labels[podUIDAnnotation]
+}
+
+func Pod(req *nritypes.Request) string {
+	ns := req.Labels[podNamespaceAnnotation]
+	pod := req.Labels[podNameAnnotation]
+	return fmt.Sprintf("%s.%s", ns, pod)
 }

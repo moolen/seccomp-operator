@@ -3,7 +3,6 @@ package nri
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	types "github.com/containerd/nri/types/v1"
 	"github.com/sirupsen/logrus"
@@ -22,12 +21,6 @@ type PluginConfig struct {
 	ProfileDir  string `json:"profileDir"`
 	DebugLogDir string `json:"debugLogDir"`
 }
-
-const (
-	podNameAnnotation      string = "io.kubernetes.pod.name"
-	podNamespaceAnnotation string = "io.kubernetes.pod.namespace"
-	podUIDAnnotation       string = "io.kubernetes.pod.uid"
-)
 
 // New creates a new Plugin
 func New() *Plugin {
@@ -52,40 +45,8 @@ func (c *Plugin) Config() (*PluginConfig, error) {
 	return &cfg, err
 }
 
-// TODO: move out
-func (c *Plugin) PodUID() string {
-	return c.req.Labels[podUIDAnnotation]
-}
-
-// TODO: move out
-func (c *Plugin) Pod() string {
-	ns := c.req.Labels[podNamespaceAnnotation]
-	pod := c.req.Labels[podNameAnnotation]
-	return fmt.Sprintf("%s.%s", ns, pod)
-}
-
-// TODO: move out
-func (c *Plugin) ShouldStartTrace() bool {
-	if c.req.State != types.Create {
-		return false
-	}
-	t, ok := c.req.Spec.Annotations["io.kubernetes.cri.container-type"]
-	if !ok {
-		return false
-	}
-	return t == "container"
-}
-
-// TODO: move out
-func (c *Plugin) ShouldStopTrace() bool {
-	if c.req.State != types.Delete {
-		return false
-	}
-	t, ok := c.req.Spec.Annotations["io.kubernetes.cri.container-type"]
-	if !ok {
-		return false
-	}
-	return t == "container"
+func (c *Plugin) Request() *types.Request {
+	return c.req
 }
 
 // Invoke starts the eBPF tracer

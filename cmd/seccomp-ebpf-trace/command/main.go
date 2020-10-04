@@ -34,6 +34,11 @@ var (
 const (
 	logFileFlag  string = "log-file"
 	logLevelFlag string = "log-level"
+
+	podNameAnnotation          string = "io.kubernetes.pod.name"
+	podNamespaceAnnotation     string = "io.kubernetes.pod.namespace"
+	podUIDAnnotation           string = "io.kubernetes.pod.uid"
+	podContainerTypeAnnotation string = "io.kubernetes.cri.container-type"
 )
 
 func init() {
@@ -103,6 +108,7 @@ func App() *cli.App {
 	app.Commands = cli.Commands{
 		versionCmd,
 		invokeCmd,
+		hookCmd,
 		traceCmd,
 	}
 	return app
